@@ -25,8 +25,9 @@ jobs:
       - name: Checkout GeoServer
         uses: actions/checkout@v3
         with:
-          name: geoserver/geoserver
+          repository: geoserver/geoserver
           ref: 2.20.6
           path: './geoserver'
       - name: Build web-service-auth
+        working-directory: ./geoserver/src/community/web-service-auth
         run: mvn clean package -DskipTests=true
