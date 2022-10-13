@@ -45,7 +45,7 @@ jobs:
       - name: Source .env
         run: source .env
       - name: Build Docker Image
-        run: sudo docker -f docker-compose-build.yml build
+        run: sudo docker compose -f docker-compose-build.yml build
 #      - name: Build and Push the Container Image
 #        uses: docker/build-push-action@v3
 #        with:
