@@ -14,25 +14,25 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Runner
         run: lscpu
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Checkout GeoServer
-        uses: actions/checkout@v3
-        with:
-          repository: geoserver/geoserver
-          ref: 2.20.6
-          path: './geoserver'
-      - name: Build web-service-auth
-        working-directory: ./geoserver/src/community/web-service-auth
-        run: mvn clean package -DskipTests=true
-      - name: PWD
-        run: pwd
-      - name: Copy Overlay Resources
-        run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
-      - name: Clean GeoServer Source Dir
-        run: rm -rf geoserver
+#      - name: Set up JDK 11
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#      - name: Checkout GeoServer
+#        uses: actions/checkout@v3
+#        with:
+#          repository: geoserver/geoserver
+#          ref: 2.20.6
+#          path: './geoserver'
+#      - name: Build web-service-auth
+#        working-directory: ./geoserver/src/community/web-service-auth
+#        run: mvn clean package -DskipTests=true
+#      - name: PWD
+#        run: pwd
+#      - name: Copy Overlay Resources
+#        run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
+#      - name: Clean GeoServer Source Dir
+#        run: rm -rf geoserver
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
