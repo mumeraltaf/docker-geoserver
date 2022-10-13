@@ -34,7 +34,7 @@ jobs:
       - name: PWD
         run: pwd
       - name: Copy Overlay Resources
-        run: cp mkdir ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && -p ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
+        run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
       - name: Clean GeoServer Source Dir
         run: rm -rf geoserver
       - name: Login to Docker Hub
