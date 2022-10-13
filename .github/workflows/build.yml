@@ -31,6 +31,8 @@ jobs:
       - name: Build web-service-auth
         working-directory: ./geoserver/src/community/web-service-auth
         run: mvn clean package -DskipTests=true
+      - name: PWD
+        run: pwd
       - name: Copy Overlay Resources
         run: cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
       - name: Login to Docker Hub
