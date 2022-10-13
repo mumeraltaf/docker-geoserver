@@ -42,22 +42,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PAT }}
-      - name: Source .env
-        run: source .env
-      - name: Echo
-        run: echo $WAR_URL
-#      - name: Build Docker Image
-#        run: sudo docker compose -f docker-compose-build.yml build
-      - name: Build and Push the Container Image
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: umeraltaf/aurin-geoserver:2.20.6
-          build-args: |
-            IMAGE_VERSION=${IMAGE_VERSION}
-            JAVA_HOME=${JAVA_HOME}
-            GS_VERSION=${GS_VERSION}
-            WAR_URL=${WAR_URL}
-            DOWNLOAD_ALL_STABLE_EXTENSIONS=${DOWNLOAD_ALL_STABLE_EXTENSIONS}
-            DOWNLOAD_ALL_COMMUNITY_EXTENSIONS=${DOWNLOAD_ALL_COMMUNITY_EXTENSIONS}
-            STABLE_PLUGIN_BASE_URL=${STABLE_PLUGIN_BASE_URL}
+      - name: Build Docker Image
+        run: sudo docker compose -f docker-compose-build-umer.yml build
+      - name: Push Docker Image
+        run: sudo docker image push umeraltaf/geoserver:2.21.1
+#      - name: Build and Push the Container Image
+#        uses: docker/build-push-action@v3
+#        with:
+#          push: true
+#          tags: umeraltaf/aurin-geoserver:2.20.6
+#          build-args: |
+#            IMAGE_VERSION=${IMAGE_VERSION}
+#            JAVA_HOME=${JAVA_HOME}
+#            GS_VERSION=${GS_VERSION}
+#            WAR_URL=${WAR_URL}
+#            DOWNLOAD_ALL_STABLE_EXTENSIONS=${DOWNLOAD_ALL_STABLE_EXTENSIONS}
+#            DOWNLOAD_ALL_COMMUNITY_EXTENSIONS=${DOWNLOAD_ALL_COMMUNITY_EXTENSIONS}
+#            STABLE_PLUGIN_BASE_URL=${STABLE_PLUGIN_BASE_URL}
