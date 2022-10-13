@@ -44,6 +44,8 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PAT }}
       - name: Source .env
         run: source .env
+      - name: Echo
+        run: echo ${WAR_URL}
 #      - name: Build Docker Image
 #        run: sudo docker compose -f docker-compose-build.yml build
       - name: Build and Push the Container Image
