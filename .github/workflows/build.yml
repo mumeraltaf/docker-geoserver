@@ -1,9 +1,6 @@
-## This is basic continuous integration build for your Quarkus application.
-
 name: Build
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -31,8 +28,10 @@ jobs:
         run: pwd
       - name: Copy Overlay Resources
         run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
-      - name: Clean GeoServer Source Dir
-        run: rm -rf geoserver
+      - name: Update start.sh script for custom resources
+        run: |
+          echo "chmod +x /custom_resources/copy_custom_resources.sh" >> scripts/start.sh
+          echo "/custom_resources/copy_custom_resources.sh" >> scripts/start.sh
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -48,26 +47,3 @@ jobs:
         run: docker image tag kartoza/geoserver:2.21.1 umeraltaf/geoserver:2.21.1
       - name: Push to Repo
         run: docker image push umeraltaf/geoserver:2.21.1
-#      - name: Push To quay.io
-#        id: push-to-quay
-#        uses: redhat-actions/push-to-registry@v2
-#        with:
-#          image: umeraltaf/geoserver
-#          tags: 2.21.1
-#          registry: docker.io
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_PAT }}
-
-#      - name: Build and Push the Container Image
-#        uses: docker/build-push-action@v3
-#        with:
-#          push: true
-#          tags: umeraltaf/aurin-geoserver:2.20.6
-#          build-args: |
-#            IMAGE_VERSION=${IMAGE_VERSION}
-#            JAVA_HOME=${JAVA_HOME}
-#            GS_VERSION=${GS_VERSION}
-#            WAR_URL=${WAR_URL}
-#            DOWNLOAD_ALL_STABLE_EXTENSIONS=${DOWNLOAD_ALL_STABLE_EXTENSIONS}
-#            DOWNLOAD_ALL_COMMUNITY_EXTENSIONS=${DOWNLOAD_ALL_COMMUNITY_EXTENSIONS}
-#            STABLE_PLUGIN_BASE_URL=${STABLE_PLUGIN_BASE_URL}
