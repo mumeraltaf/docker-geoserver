@@ -1,3 +1,12 @@
+#!/bin/bash
+
+# Credits https://github.com/geosolutions-it/docker-geoserver for this script that allows a user to pass a password
+# or username on runtime.
+
+# Source the functions from other bash scripts
+
+source /scripts/env-data.sh
+
 if [ -e "${GEOSERVER_DATA_DIR}"/security/auth/aurin-geoserver-auth/config.xml ]
 then
   echo "Web Auth Plugin Already Configured"
