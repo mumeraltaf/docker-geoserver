@@ -13,10 +13,10 @@ then
 else
   mkdir -p "${GEOSERVER_DATA_DIR}"/security/auth/aurin-geoserver-auth
 
-  cp /build_datata/geoserver_config.xml "${GEOSERVER_DATA_DIR}"/security/auth/aurin-geoserver-auth/config.xml
-  cp /build_datata/config.xml "${GEOSERVER_DATA_DIR}"/security/config.xml
-  cp /build_datata/monitor.properties "${GEOSERVER_DATA_DIR}"/monitoring/monitor.properties
-  cp /build_datata/content.ftl "${GEOSERVER_DATA_DIR}"/monitoring/content.ftl
+  cp /build_data/geoserver_config.xml "${GEOSERVER_DATA_DIR}"/security/auth/aurin-geoserver-auth/config.xml
+  cp /build_data/config.xml "${GEOSERVER_DATA_DIR}"/security/config.xml
+  cp /build_data/monitor.properties "${GEOSERVER_DATA_DIR}"/monitoring/monitor.properties
+  cp /build_data/content.ftl "${GEOSERVER_DATA_DIR}"/monitoring/content.ftl
 
   sed -i "s#AURIN_GEOSERVER_AUTHZ_SERVICE#${AURIN_GEOSERVER_AUTHZ_SERVICE}#g" "${GEOSERVER_DATA_DIR}"/security/auth/aurin-geoserver-auth/config.xml
 fi
