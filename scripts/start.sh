@@ -98,19 +98,8 @@ fi
 export S3_SERVER_URL S3_USERNAME S3_PASSWORD
 
 function community_config() {
-    if [[ ${ext} == 's3-geotiff-plugin' ]]; then
-        s3_config
-        echo "Installing ${ext} "
-        install_plugin /community_plugins "${ext}"
-        if [[ ! -f ${CATALINA_HOME}/webapps/geoserver/WEB-INF/lib/ehcache-3.4.0.jar ]];then
-          validate_url https://repo1.maven.org/maven2/org/ehcache/ehcache/3.4.0/ehcache-3.4.0.jar && \
-          mv ehcache-3.4.0.jar ${CATALINA_HOME}/webapps/geoserver/WEB-INF/lib/
-        fi
-
-    elif [[ ${ext} != 's3-geotiff-plugin' ]]; then
-        echo "Installing ${ext} "
-        install_plugin /community_plugins "${ext}"
-    fi
+     echo -e "\e[32m  Installing ${ext} \033[0m"
+    install_plugin /community_plugins "${ext}"
 }
 
 # Install community modules plugins
@@ -146,7 +135,7 @@ if [[ ${ACTIVATE_ALL_COMMUNITY_EXTENSIONS} =~ [Tt][Rr][Uu][Ee] ]];then
    pushd /community_plugins/ || exit
     for val in *.zip; do
         ext=${val%.*}
-        echo "Enabling ${ext} for GeoServer ${GS_VERSION}"
+        echo -e "\e[32m  Enabling ${ext} for GeoServer ${GS_VERSION} \033[0m"
         community_config
     done
     pushd "${GEOSERVER_HOME}" || exit
@@ -192,10 +181,6 @@ export REQUEST_TIMEOUT PARALLEL_REQUEST GETMAP REQUEST_EXCEL SINGLE_USER GWC_REQ
 # Setup control flow properties
 setup_control_flow
 
-# Setup tomcat apps manager
-export TOMCAT_PASSWORD TOMCAT_USER
-
-
 
 if [[ ${POSTGRES_JNDI} =~ [Tt][Rr][Uu][Ee] ]];then
   postgres_ssl_setup
@@ -227,7 +212,11 @@ if [[ "${TOMCAT_EXTRAS}" =~ [Tt][Rr][Uu][Ee] ]]; then
         generate_random_string 18
         export TOMCAT_PASSWORD=${RAND}
         echo -e "[Entrypoint] GENERATED tomcat  PASSWORD: \e[1;31m $TOMCAT_PASSWORD \033[0m"
+    else
+       export TOMCAT_PASSWORD
     fi
+    # Setup tomcat apps manager
+    export TOMCAT_USER
     tomcat_user_config
 else
     delete_folder "${CATALINA_HOME}"/webapps/ROOT &&
@@ -242,7 +231,7 @@ else
     fi
 fi
 
-
+# Enable SSL
 if [[ ${SSL} =~ [Tt][Rr][Uu][Ee] ]]; then
 
   # convert LetsEncrypt certificates
@@ -306,7 +295,8 @@ else
     sed -i -e '83,126d' "${CATALINA_HOME}"/conf/ssl-tomcat_no_https.xsl
     SSL_CONF=${CATALINA_HOME}/conf/ssl-tomcat_no_https.xsl
 
-fi
+fi # End SSL settings
+
 
 # change server configuration
 
@@ -423,9 +413,8 @@ else
 fi
 
 
-if [[ -f ${CATALINA_HOME}/conf/ssl-tomcat_no_https.xsl ]];then
-  rm "${CATALINA_HOME}"/conf/ssl-tomcat_no_https.xsl
-fi
+# Cleanup temp file
+delete_file ${CATALINA_HOME}/conf/ssl-tomcat_no_https.xsl
 
 
 if [[ -z "${EXISTING_DATA_DIR}" ]]; then
@@ -433,3 +422,4 @@ if [[ -z "${EXISTING_DATA_DIR}" ]]; then
 fi
 
 setup_logging
+

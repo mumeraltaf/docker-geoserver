@@ -80,6 +80,15 @@ function web_cors() {
     else
       # default values
       cp /build_data/web.xml "${CATALINA_HOME}"/conf/
+      ###
+      # Deactivate CORS filter in web.xml if DISABLE_CORS=true
+      # Useful if CORS is handled outside of Tomcat (e.g. in a proxying webserver like nginx)
+      ###
+      if [[ "${DISABLE_CORS}" =~ [Tt][Rr][Uu][Ee] ]]; then
+        echo "Deactivating Tomcat CORS filter"
+        sed 's/<!-- CORS_START.*/<!-- CORS DEACTIVATED BY DISABLE_CORS -->\n<!--/; s/^.*<!-- CORS_END -->/-->/' \
+          ${CATALINA_HOME}/conf/web.xml
+      fi
     fi
   fi
 }
@@ -111,21 +120,70 @@ function download_extension() {
 
 }
 
-# A little logic that will fetch the geoserver war zip file if it is not available locally in the resources dir
-function download_geoserver() {
+function validate_geo_install() {
+  DATA_PATH=$1
+  # Check if geoserver is installed early so that we can fail early on
+  if [[ $(ls -A ${DATA_PATH})  ]]; then
+     echo -e "\e[32m  GeoServer install dir exist proceed with install \033[0m"
+  else
+    exit 1
+  fi
 
-if [[ ! -f /tmp/resources/geoserver-${GS_VERSION}.zip ]]; then
+}
+
+
+
+function unzip_geoserver() {
+  if [[ -f /tmp/geoserver/geoserver.war ]]; then
+    unzip /tmp/geoserver/geoserver.war -d "${CATALINA_HOME}"/webapps/geoserver &&
+    validate_geo_install "${CATALINA_HOME}"/webapps/geoserver && \
+    cp -r "${CATALINA_HOME}"/webapps/geoserver/data "${CATALINA_HOME}" &&
+    mv "${CATALINA_HOME}"/data/security "${CATALINA_HOME}" &&
+    rm -rf "${CATALINA_HOME}"/webapps/geoserver/data &&
+    mv "${CATALINA_HOME}"/webapps/geoserver/WEB-INF/lib/postgresql-* "${CATALINA_HOME}"/postgres_config/ &&
+    rm -rf /tmp/geoserver
+else
+    cp -r /tmp/geoserver/* "${GEOSERVER_HOME}"/ && \
+    validate_geo_install "${GEOSERVER_HOME}"/ && \
+    cp -r "${GEOSERVER_HOME}"/data_dir "${CATALINA_HOME}"/data &&
+    mv "${CATALINA_HOME}"/data/security "${CATALINA_HOME}"
+fi
+
+}
+
+
+
+# A little logic that will fetch the geoserver war zip file if it is not available locally in the resources dir
+function package_geoserver() {
+
+if [[ ! -f /tmp/resources/geoserver-${GS_VERSION}.zip ]] || [[ ! -f /tmp/resources/geoserver-${GS_VERSION}-bin.zip ]]; then
     if [[ "${WAR_URL}" == *\.zip ]]; then
-      destination=/tmp/resources/geoserver-${GS_VERSION}.zip
-      ${request} "${WAR_URL}" -O "${destination}"
-      unzip /tmp/resources/geoserver-"${GS_VERSION}".zip -d /tmp/geoserver
+      if [[ "${WAR_URL}" == *\bin.zip ]];then
+        destination=/tmp/resources/geoserver-${GS_VERSION}-bin.zip
+        ${request} "${WAR_URL}" -O "${destination}"
+        unzip /tmp/resources/geoserver-${GS_VERSION}-bin.zip -d /tmp/geoserver && \
+        unzip_geoserver
+      else
+        destination=/tmp/resources/geoserver-${GS_VERSION}.zip
+        ${request} "${WAR_URL}" -O "${destination}"
+        unzip /tmp/resources/geoserver-"${GS_VERSION}".zip -d /tmp/geoserver && \
+        unzip_geoserver
+      fi
     else
       destination=/tmp/geoserver/geoserver.war
       mkdir -p /tmp/geoserver/ &&
       ${request} "${WAR_URL}" -O ${destination}
     fi
 else
-  unzip /tmp/resources/geoserver-"${GS_VERSION}".zip -d /tmp/geoserver
+  if [[  -f /tmp/resources/geoserver-${GS_VERSION}.zip ]];then
+    unzip /tmp/resources/geoserver-"${GS_VERSION}".zip -d /tmp/geoserver && \
+    unzip_geoserver
+
+  elif [[  -f /tmp/resources/geoserver-${GS_VERSION}-bin.zip  ]];then
+    unzip /tmp/resources/geoserver-"${GS_VERSION}".zip -d /tmp/geoserver && \
+    unzip_geoserver
+
+  fi
 fi
 
 }
@@ -179,17 +237,7 @@ function broker_xml_config() {
 
 # Helper function to configure s3 bucket
 # https://docs.geoserver.org/latest/en/user/community/s3-geotiff/index.html
-function s3_config() {
-  if [[ ! -f "${GEOSERVER_DATA_DIR}"/s3.properties ]]; then
-    # If it doesn't exists, copy from /settings directory if exists
-    if [[ -f ${EXTRA_CONFIG_DIR}/s3.properties ]]; then
-      envsubst < "${EXTRA_CONFIG_DIR}"/s3.properties > "${GEOSERVER_DATA_DIR}"/s3.properties
-    else
-      # default value
-      envsubst < /build_data/s3.properties > "${GEOSERVER_DATA_DIR}"/s3.properties
-    fi
-  fi
-}
+# Remove this based on https://www.mail-archive.com/geoserver-users@lists.sourceforge.net/msg34214.html
 
 # Helper function to install plugin in proper path
 
