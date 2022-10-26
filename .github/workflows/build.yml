@@ -28,10 +28,13 @@ jobs:
         run: pwd
       - name: Copy Overlay Resources
         run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
+      - name: Update Dockerfile to copy in custom resources
+        run: |
+          echo "COPY custom_resources /custom_resources >> scripts/start.sh
       - name: Update start.sh script for custom resources
         run: |
-          echo "chmod +x /build_data/copy_custom_resources.sh" >> scripts/start.sh
-          echo "/build_data/copy_custom_resources.sh" >> scripts/start.sh
+          echo "chmod +x /custom_resources/copy_custom_resources.sh" >> scripts/start.sh
+          echo "/custom_resources/copy_custom_resources.sh" >> scripts/start.sh
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
