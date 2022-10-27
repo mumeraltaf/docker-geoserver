@@ -1,4 +1,4 @@
-name: Build
+name: Test
 
 on:
   workflow_dispatch:
@@ -22,6 +22,6 @@ jobs:
           ref: 2.21.2
           path: './geoserver'
       - name: load var
-        run: export $(grep -v '^#' .env | xargs) >> $GITHUB_ENV
+        run: $(grep -v '^#' .env) >> $GITHUB_ENV
       - name: echo var
         run:       echo "${{ env.GS_VERSION }}"
