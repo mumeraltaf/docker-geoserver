@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    environment: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Runner
+        run: lscpu
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Checkout GeoServer
+        uses: actions/checkout@v3
+        with:
+          repository: geoserver/geoserver
+          ref: 2.21.2
+          path: './geoserver'
+      - name: load var
+        run: export $(grep -v '^#' .env | xargs) >> $GITHUB_ENV
+      - name: echo var
+        run:       echo "${{ env.GS_VERSION }}"
