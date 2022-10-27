@@ -41,8 +41,6 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        with:
-          use: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -50,13 +48,12 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PAT }}
       - name: Build Docker Image
         run: |
-          sudo docker buildx build -t umeraltaf/geoserver:${{ env.GS_VERSION }} \
+          sudo docker build -t umeraltaf/geoserver:${{ env.GS_VERSION }} \
           --build-arg IMAGE_VERSION=${{ env.IMAGE_VERSION }} \
           --build-arg JAVA_HOME=${{ env.JAVA_HOME }} \
           --build-arg GS_VERSION=${{ env.GS_VERSION }} \
           --build-arg WAR_URL=${{ env.WAR_URL }} \
           --build-arg DOWNLOAD_ALL_STABLE_EXTENSIONS=${{ env.DOWNLOAD_ALL_COMMUNITY_EXTENSIONS }} \
-          --build-arg STABLE_PLUGIN_BASE_URL=${{ env.STABLE_PLUGIN_BASE_URL }} \
-          --platform linux/amd64,linux/arm64 .
+          --build-arg STABLE_PLUGIN_BASE_URL=${{ env.STABLE_PLUGIN_BASE_URL }} .
       - name: Push to Repo
         run: docker image push umeraltaf/geoserver:"${{ env.GS_VERSION }}"
