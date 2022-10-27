@@ -47,8 +47,13 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PAT }}
       - name: Build Docker Image
-        run: sudo docker compose -f docker-compose-build.yml build
-      - name: Tag Image
-        run: docker image tag kartoza/geoserver:"${{ env.GS_VERSION }}" umeraltaf/geoserver:"${{ env.GS_VERSION }}"
+        run: |
+          sudo docker build -t umeraltaf/geoserver:${{ env.GS_VERSION }} \
+          --build-arg IMAGE_VERSION=${{ env.IMAGE_VERSION }} \
+          --build-arg JAVA_HOME=${{ env.JAVA_HOME }} \
+          --build-arg GS_VERSION=${{ env.GS_VERSION }} \
+          --build-arg WAR_URL=${{ env.WAR_URL }} \
+          --build-arg DOWNLOAD_ALL_STABLE_EXTENSIONS=${{ env.DOWNLOAD_ALL_COMMUNITY_EXTENSIONS }} \
+          --build-arg STABLE_PLUGIN_BASE_URL=${{ env.STABLE_PLUGIN_BASE_URL }} .
       - name: Push to Repo
         run: docker image push umeraltaf/geoserver:"${{ env.GS_VERSION }}"

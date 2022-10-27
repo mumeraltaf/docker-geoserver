@@ -23,13 +23,13 @@ jobs:
           repository: geoserver/geoserver
           ref: ${{ env.GS_VERSION }}
           path: './geoserver'
-#      - name: Build web-service-auth
-#        working-directory: ./geoserver/src/community/web-service-auth
-#        run: mvn clean package -DskipTests=true
-#      - name: PWD
-#        run: pwd
-#      - name: Copy Overlay Resources
-#        run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
+      - name: Build web-service-auth
+        working-directory: ./geoserver/src/community/web-service-auth
+        run: mvn clean package -DskipTests=true
+      - name: PWD
+        run: pwd
+      - name: Copy Overlay Resources
+        run: mkdir -p ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib && cp ./geoserver/src/community/web-service-auth/target/*.jar ./resources/overlays/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/
       - name: Update Dockerfile to copy in custom resources
         run: |
           echo "ADD custom_resources /custom_resources" >> Dockerfile
