@@ -12,6 +12,6 @@ jobs:
       - name: Setup Runner
         run: lscpu
       - name: load var
-        run: export $(grep -v '^#' .env) >> $GITHUB_ENV
+        run: cat .env >> $GITHUB_ENV
       - name: echo var
         run:       echo "${{ env.GS_VERSION }}"
